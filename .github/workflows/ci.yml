@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    name: Lint y ejecución de tareas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check homework/
+
+      - name: HW1 · script de explicación
+        working-directory: homework/hw1-numpy-boolean-masks
+        run: python hw1_explicacion.py
+
+      - name: HW1 · ejecutar notebook
+        run: >
+          jupyter nbconvert --to notebook --execute
+          --output-dir "$RUNNER_TEMP"
+          homework/hw1-numpy-boolean-masks/hw1_numpy.ipynb
