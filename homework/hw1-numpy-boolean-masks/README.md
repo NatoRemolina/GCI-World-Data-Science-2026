@@ -1,39 +1,27 @@
-# HW1 Session 2: filtrado con máscaras booleanas en NumPy
+# HW1 · Filtrado con máscaras booleanas en NumPy
 
-Ejecutado el 2026-10-07 con Python 3.14.4 y NumPy 2.5.3 en el entorno virtual del repositorio.
-Entrega: jueves 8 de octubre de 2026, 11:00 UTC (6:00 a.m. hora de Colombia).
+| | |
+|---|---|
+| **Sesión** | 2 · Manipulación eficiente de datos con NumPy |
+| **Entrega** | 2026-10-08 |
+| **Estado** | ✅ Completada |
+| **Entorno** | Python 3.14 · NumPy 2.5 |
+| **Archivos** | [`hw1_numpy.ipynb`](hw1_numpy.ipynb) · [`hw1_explicacion.py`](hw1_explicacion.py) · [`numpy_paso_a_paso.pdf`](numpy_paso_a_paso.pdf) |
 
----
+## 1. Enunciado
 
-## 0. Cómo ejecutarlo
+Dado un arreglo unidimensional de enteros, devolver solo los elementos que cumplen **dos condiciones a la vez**:
 
-Con el entorno virtual del repositorio activo (ver [docs/setup.md](../../docs/setup.md)):
+1. Ser **múltiplos de 5**.
+2. Ser **impares**.
 
-```bash
-cd homework/hw1-numpy-boolean-masks
-python hw1_explicacion.py
+```python
+homework(a: np.ndarray) -> np.ndarray
 ```
 
-**En VS Code con el notebook:** abre `hw1_numpy.ipynb`, haz clic en **Select Kernel**, elige **Python Environments** y luego `.venv`. Ejecuta las celdas en orden con Shift + Enter.
+## 2. Enfoque
 
-**Archivos de esta carpeta:**
-
-| Archivo | Contenido |
-|---|---|
-| `hw1_numpy.ipynb` | Notebook de la tarea resuelto |
-| `hw1_explicacion.py` | Script con el paso a paso, casos de prueba y otros usos de las máscaras |
-| `numpy_paso_a_paso.pdf` | Guía en PDF del método de resolución |
-
----
-
-## 1. El problema en palabras simples
-
-De una lista de números enteros hay que quedarse solo con los que cumplen **dos reglas a la vez**:
-
-1. Ser **múltiplo de 5**, es decir, estar en la tabla del 5.
-2. Ser **impar**.
-
-Resuelto a mano con `[1, 5, 10, 3, 4, 25, 30]`:
+Resuelto primero a mano con `[1, 5, 10, 3, 4, 25, 30]`:
 
 | Número | ¿Múltiplo de 5? | ¿Impar? | ¿Se queda? |
 |---|---|---|---|
@@ -45,20 +33,16 @@ Resuelto a mano con `[1, 5, 10, 3, 4, 25, 30]`:
 | **25** | Sí | Sí | **Sí** |
 | 30 | Sí | No | No |
 
-Resultado: **5 y 25**.
-
-## 2. El residuo: operador `%`
+Ambas condiciones se expresan con el residuo de la división (operador `%`):
 
 | Pregunta | Operación | Con 25 | Con 10 |
 |---|---|---|---|
 | ¿Es múltiplo de 5? | `x % 5 == 0` | sobra 0 → Sí | sobra 0 → Sí |
 | ¿Es impar? | `x % 2 == 1` | sobra 1 → Sí | sobra 0 → No |
 
-Con negativos también funciona: en Python `-5 % 2` da `1`.
+En lugar de recorrer el arreglo con un `for`, NumPy evalúa cada condición sobre todos los elementos a la vez y devuelve una **máscara booleana**. Las dos máscaras se combinan con `&` y se usan para indexar el arreglo.
 
-## 3. Cómo lo resuelve NumPy
-
-NumPy hace la pregunta a todos los números a la vez y devuelve una **máscara** de `True` y `False`. Luego `a[mask]` se queda solo con los elementos marcados como `True`.
+## 3. Solución
 
 ```python
 def homework(a):
@@ -67,15 +51,27 @@ def homework(a):
     return my_result
 ```
 
-Esta función va en la celda debajo de **"2. Your Answer"** del notebook y es lo que se pega en Omnicampus, sin `import`.
+- `a % 5 == 0` y `a % 2 == 1` producen arreglos de `True`/`False` del mismo tamaño que `a`.
+- `&` combina las máscaras elemento a elemento. Cada condición va entre paréntesis porque `&` tiene mayor precedencia que `==`.
+- `a[mask]` conserva solo las posiciones marcadas como `True`.
+- También funciona con negativos: en Python, `-5 % 2` da `1`.
 
-Salida real del script:
+## 4. Validación
+
+| Caso | Entrada | Esperado | Obtenido | ✔ |
+|---|---|---|---|---|
+| 1 | `[1, 5, 10, 3, 4, 25, 30]` | `[5, 25]` | `[5, 25]` | ✅ |
+| 2 | `[11, 15, 20, 21, 35, 40, 45]` | `[15, 35, 45]` | `[15, 35, 45]` | ✅ |
+| 3 | `[2, 4, 6, 8]` | `[]` | `[]` | ✅ |
+| Extra · negativos | `[-5, -15, -10, -25, 0, 7]` | `[-5, -15, -25]` | `[-5, -15, -25]` | ✅ |
+
+[`hw1_explicacion.py`](hw1_explicacion.py) verifica los casos automáticamente con `np.array_equal`, y el CI del repositorio ejecuta tanto el script como el notebook en cada `push`.
+
+## 5. Resultados
+
+Salida del script:
 
 ```text
-=== Entorno ===
-Python: .venv/bin/python
-NumPy: 2.5.3
-
 === Paso a paso con el ejemplo ===
 a                              = [ 1  5 10  3  4 25 30]
 a % 5                          = [1 0 0 3 4 0 0]
@@ -91,65 +87,49 @@ Caso 3           []             esperado [] -> OK
 Extra negativos  [ -5 -15 -25]  esperado [-5, -15, -25] -> OK
 ```
 
-## 4. Para qué sirve NumPy
+**Rendimiento.** Resultado de filtrar 10 millones de enteros con la misma regla en mi equipo:
 
-NumPy es la librería de Python para operar **arreglos de números completos sin escribir ciclos `for`**. A esto se le llama vectorización, y es la base de pandas, scikit-learn, TensorFlow y PyTorch.
+| Implementación | Tiempo |
+|---|---|
+| Python puro | 0.219 s |
+| NumPy (máscara booleana) | 0.044 s |
 
-- **Código corto:** una línea expresa la regla completa.
-- **Velocidad:** las operaciones corren en código C compilado.
-- **Menos memoria:** los elementos tienen un solo tipo y se guardan juntos.
-- **Herramientas listas:** estadística, álgebra lineal y números aleatorios.
+NumPy fue **5 veces más rápido** y dio el mismo resultado, porque sus operaciones corren en código C compilado sobre memoria contigua de un solo tipo.
 
-Medición en este equipo, filtrando 10 millones de números con la regla de la tarea:
+## 6. Aprendizajes
 
-```text
-Python: 0.219 s | NumPy: 0.044 s | NumPy es 5.0 veces más rápido
-Mismo resultado: True
-```
-
-## 5. Otros casos donde se usa la misma idea
-
-Salida real del script:
-
-```text
-Aprobados (nota >= 3.0):       [4.  3.2 4.7]
-Sensor sin valores imposibles: [22.1 23.  24.5 21.7]
-Precios entre 40k y 100k:      [85000 45000]
-Compras sospechosas:           [5000 7200]
-Sin datos faltantes (NaN):     [1. 3.]
-Negativos a cero (ReLU):       [3 0 7 0]
-Etiquetas por edad:            ['Menor' 'Adulto' 'Adulto' 'Adulto' 'Adulto']
-Imagen blanco y negro:
- [[  0 255]
- [255   0]]
-```
+**La misma idea aplicada a otros problemas** (incluidos en el script):
 
 | Caso | Código |
 |---|---|
 | Estudiantes aprobados | `notas[notas >= 3.0]` |
-| Limpiar un sensor | `t[(t > -50) & (t < 60)]` |
+| Limpiar lecturas imposibles de un sensor | `t[(t > -50) & (t < 60)]` |
 | Rango de precios | `p[(p >= 40000) & (p <= 100000)]` |
-| Compras sospechosas | `v[v > v.mean() + 0.5 * v.std()]` |
+| Detección simple de anomalías | `v[v > v.mean() + 0.5 * v.std()]` |
 | Quitar datos faltantes | `x[~np.isnan(x)]` |
-| Negativos a cero (ReLU) | `s[s < 0] = 0` |
-| Crear etiquetas | `np.where(edades >= 18, 'Adulto', 'Menor')` |
-| Imagen blanco y negro | `np.where(img > 128, 255, 0)` |
+| Activación ReLU | `s[s < 0] = 0` |
+| Crear etiquetas | `np.where(edades >= 18, "Adulto", "Menor")` |
 
-Operadores para combinar condiciones: `&` (y), `|` (o) y `~` (no). Cada condición va siempre entre paréntesis.
+Operadores para combinar condiciones: `&` (y), `|` (o) y `~` (no).
 
-## 6. Errores comunes y entrega
+**Errores comunes identificados:**
 
-| Error | Qué pasa | Solución |
+| Error | Síntoma | Corrección |
 |---|---|---|
-| Dejar la línea `some` del notebook original | `NameError` | Borrar el contenido de la celda y pegar la función |
-| Usar `and` en vez de `&` | `ValueError` | Usar `&` |
-| Olvidar los paréntesis | Resultado incorrecto o error | `(a % 5 == 0) & (a % 2 == 1)` |
-| Poner `import` dentro de la función | Omnicampus puede rechazarla | El evaluador ya incluye NumPy |
+| Usar `and` en lugar de `&` | `ValueError: truth value of an array is ambiguous` | Usar `&` |
+| Omitir los paréntesis | Resultado incorrecto o error de tipos | `(a % 5 == 0) & (a % 2 == 1)` |
 | Devolver la máscara | Sale `[False True ...]` | Devolver `a[mask]` |
+| Poner `import` dentro de la función | El evaluador la rechaza | Las librerías ya vienen cargadas |
 
-Pasos para entregar:
+## 7. Cómo ejecutar
 
-1. Abrir Homework 1 en Omnicampus.
-2. Pegar la función completa, desde `def homework(a):` hasta `return my_result`.
-3. Hacer clic en **[Python code submission]**.
-4. Verificar que la nota sea 3.0. Cuenta la **última** entrega, así que no se reenvía después de un 3.0.
+Con el entorno del repositorio activo (ver [docs/setup.md](../../docs/setup.md)):
+
+```bash
+cd homework/hw1-numpy-boolean-masks
+python hw1_explicacion.py
+```
+
+Para el notebook, abre [`hw1_numpy.ipynb`](hw1_numpy.ipynb) y selecciona el kernel `.venv`.
+
+La guía [`numpy_paso_a_paso.pdf`](numpy_paso_a_paso.pdf) resume el método completo para leer, resolver y probar este tipo de problemas.
