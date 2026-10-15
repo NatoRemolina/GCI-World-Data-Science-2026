@@ -1,0 +1,18 @@
+# Núcleo de ciencia de datos
+numpy
+pandas
+scipy
+scikit-learn
+
+# Visualización
+matplotlib
+seaborn
+plotly
+
+# Datos externos
+requests
+ucimlrepo
+
+# Notebooks
+ipykernel
+jupyterlab

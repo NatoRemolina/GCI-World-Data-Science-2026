@@ -1,0 +1,30 @@
+# --- Material oficial del curso (copyright Matsuo-Iwasawa Lab, UTokyo) ---
+# Se conserva localmente pero no se publica. Solo se versiona su README.
+course-materials/*
+!course-materials/README.md
+
+# Datos descargados por los notebooks de tareas
+MyAnimeList-Database-master/
+*.zip
+
+# --- Python ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Sistema operativo y editores ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Secretos ---
+.env
+*.key
+
