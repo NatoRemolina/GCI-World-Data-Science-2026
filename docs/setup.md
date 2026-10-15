@@ -27,6 +27,12 @@ which python
 pip install -r requirements.txt
 ```
 
+Para incluir también las herramientas de calidad (`ruff` y `nbconvert`), que son las mismas que usa el CI:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
 ## 4. Usar el entorno en notebooks
 
 - **VS Code:** abre el `.ipynb`, haz clic en **Select Kernel** → **Python Environments** → `.venv`.
@@ -44,7 +50,7 @@ deactivate
 pip install <librería>
 ```
 
-Después agrégala a `requirements.txt` en la sección que corresponda.
+Después agrégala a `requirements.txt` en la sección que corresponda, con la versión exacta (`pip show <librería>`).
 
 ## Problemas comunes
 
