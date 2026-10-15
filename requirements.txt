@@ -1,18 +1,20 @@
+# Dependencias del entorno de estudio (versiones verificadas con Python 3.14)
+
 # Núcleo de ciencia de datos
-numpy
-pandas
-scipy
-scikit-learn
+numpy==2.5.4
+pandas==3.0.6
+scipy==1.18.1
+scikit-learn==1.9.1
 
 # Visualización
-matplotlib
-seaborn
-plotly
+matplotlib==3.11.2
+seaborn==0.13.2
+plotly==7.1.0
 
 # Datos externos
-requests
-ucimlrepo
+requests==2.34.2
+ucimlrepo==0.0.7
 
 # Notebooks
-ipykernel
-jupyterlab
+ipykernel==7.4.0
+jupyterlab==4.6.4

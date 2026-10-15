@@ -1,0 +1,4 @@
+# Herramientas de calidad y verificación (no necesarias para estudiar)
+-r requirements.txt
+ruff==0.17.1
+nbconvert==7.17.2

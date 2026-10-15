@@ -1,0 +1,13 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-include = ["*.ipynb"]
+exclude = ["course-materials"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Las celdas de preparación de los notebooks vienen de la plantilla oficial del curso
+# y se conservan sin cambios para no alterar el entorno de evaluación.
+"*.ipynb" = ["E401", "F401", "I001"]
